@@ -1,6 +1,9 @@
 import React, { Component } from 'react'
 import ListContacts from './ListContacts'
 import * as ContactsAPI from './utils/ContactsAPI';
+import CreateContacts from './createContact'
+import { BrowserRouter } from 'react-router-dom'
+import { Route } from 'react-router-dom'
 
 class App extends Component {
   state = {
@@ -21,13 +24,33 @@ class App extends Component {
   }
 
 
+  createContact(contact) {
+    ContactsAPI.create().then(contact => {
+      this.setState(state => {
+        contacts: state.contacts.concat([contact])
+      })
+    })
+  }
+
+
   render() {
     return (
-      <div>
-        <ListContacts
-          onDeleteContact = {this.removeContact}
-          contacts={this.state.contacts}
+      <div className="App">
+        <Route exact path="/" render={() => (
+          <ListContacts
+            onDeleteContact = {this.removeContact}
+            contacts={this.state.contacts}
+          />
+        )}
         />
+        <Route path='/create' render={({ history }) => (
+          <CreateContacts
+            onCreateContact={(contact) => {
+              this.createContact(contact)
+              history.push('/')
+            }}
+          />
+        )}/>
       </div>
     )
   }
